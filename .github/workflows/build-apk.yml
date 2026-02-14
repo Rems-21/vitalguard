@@ -1,0 +1,52 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Initialize Capacitor Android
+        run: |
+          npx cap add android
+
+      - name: Enable Cleartext Traffic (For ESP32 HTTP)
+        # Cette étape modifie automatiquement le fichier AndroidManifest.xml pour autoriser le HTTP (non sécurisé)
+        # Indispensable pour communiquer avec l'IP locale de l'ESP32.
+        run: |
+          sed -i 's/android:allowBackup="true"/android:allowBackup="true" android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml
+
+      - name: Sync Capacitor
+        run: npx cap sync
+
+      - name: Build APK with Gradle
+        cd android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: vitalguard-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

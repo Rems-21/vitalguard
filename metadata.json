@@ -1,0 +1,5 @@
+{
+  "name": "VitalGuard Web Monitor",
+  "description": "A real-time medical dashboard to visualize vital signs (Heart Rate, SpO2, Temp, BP) transmitted from an ESP32 wearable. Features AI-powered anomaly detection.",
+  "requestFramePermissions": []
+}
