@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Dependencies
         run: npm install
@@ -29,14 +28,10 @@ jobs:
       - name: Add Android Platform
         run: npx cap add android
 
-      - name: Enable Cleartext Traffic (ESP32 HTTP)
-        run: |
-          sed -i 's/android:allowBackup="true"/android:allowBackup="true" android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml
-
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build APK with Gradle
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
@@ -45,5 +40,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: vitalguard-debug.apk
+          name: app-debug.apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
